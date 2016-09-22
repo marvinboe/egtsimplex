@@ -8,7 +8,8 @@ pointing into the direction of the dynamics and color codes
 denoting the strength of change is created.
 
 basic usage:
-`import egtsimplex
+~~~~
+import egtsimplex
 #define function for the dynamics
 def f(x):
     return [x[0],-x[1],x[2]]
@@ -17,7 +18,8 @@ def f(x):
 dynamics=egtsimplex.simplex_dynamics(f)
 
 #plot the simplex dynamics
-dynamics.plot()`
+dynamics.plot()
+~~~~
 
 
 
