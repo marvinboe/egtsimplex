@@ -20,6 +20,7 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
+import math
 
 print("module loaded")
 
@@ -59,32 +60,40 @@ class simplex_dynamics:
     def ba2xy(self,x):
         ### x: array of 3-dim ba coordinates
         ### corners: coordinates of corners of ba coordinate system
+        x=np.array(x)
+        # print(self.corners.shape)
+        # print(self.corners.T)
+        # print(x)
         return self.corners.T.dot(x.T).T
 
 
     def calculate_stationary_points(self):
         fp_raw=[]
-        border=270
-        for x,y in zip(self.trimesh_fine.x[border:-border], self.trimesh_fine.y[border:-border]):
+        border=5 #don't check points close to simplex border
+        delta=1e-12
+        for x,y in zip(self.trimesh.x[border:-border], self.trimesh.y[border:-border]):
             start=self.xy2ba(x,y)
-            delta=1e-12
             fp_try=np.array([])
-            # if np.allclose(self.f(start,0),np.array([0,0,0]),atol=delta,rtol=delta):
-            #     #print(start)
-            #     fp_try=start
-            # else:
-            sol=scipy.optimize.root(self.f,start,args=(0,))#,xtol=1.49012e-10,maxfev=1000
+
+            sol=scipy.optimize.root(self.f,start,args=(0,),method="hybr")#,xtol=1.49012e-10,maxfev=1000
             if sol.success:
                 fp_try=sol.x
+                #check if FP is in simplex
+                if not math.isclose(np.sum(fp_try), 1.,abs_tol=2.e-3):
+                    continue
+                if not np.all((fp_try>-delta) & (fp_try <1+delta)):#only if fp in simplex
+                    continue
             else:
                 continue
-            #print (start,fp_try)
-            if np.all((fp_try>-delta) & (fp_try <1+delta)):
-                if not np.array([np.allclose(fp_try,x,atol=1e-5) for x in fp_raw]).any():
+            #only add new fixed points to list
+            if not np.array([np.allclose(fp_try,x,atol=1e-7) for x in fp_raw]).any():
                     fp_raw.append(fp_try.tolist())
+        #add fixed points in correct coordinates to fixpoints list
         fp_raw=np.array(fp_raw)
-        # print(fp_raw)
-        self.fixpoints=self.corners.T.dot(np.array(fp_raw).T).T
+        if fp_raw.shape[0]>0:
+            self.fixpoints=self.corners.T.dot(np.array(fp_raw).T).T
+        else:
+            self.fixpoints=np.array([])
 
     def calc_direction_and_strength(self):
         direction= [self.f(self.xy2ba(x,y),0) for x,y in zip(self.trimesh.x, self.trimesh.y)]
@@ -93,7 +102,7 @@ class simplex_dynamics:
         #print(direction_ba_norm)
         self.pvals =[np.linalg.norm(v) for v in direction]
 
-    def plot_simplex(self,ax,cmap='viridis',**kwargs):
+    def plot_simplex(self,ax,cmap='viridis',typelabels=["A","B","C"],**kwargs):
 
         ax.triplot(self.triangle,linewidth=0.8,color="black")
         ax.tricontourf(self.trimesh, self.pvals, alpha=0.8, cmap=cmap,**kwargs)
@@ -103,9 +112,10 @@ class simplex_dynamics:
         ax.axis('off')
 
         #timescatter=ax.scatter(points[::5,0],points[::5,1],c=t[::5],linewidth=0.0,cmap='viridis',alpha=.5)
-        ax.scatter(self.fixpoints[:,0],self.fixpoints[:,1],c="black",s=70,linewidth=0.3)
+        if self.fixpoints.shape[0]>0:
+            ax.scatter(self.fixpoints[:,0],self.fixpoints[:,1],c="black",s=70,linewidth=0.3)
         #fig.colorbar(timescatter,label="time")
-        ax.annotate("D",(0,0),xytext=(-0.0,-0.15),horizontalalignment='center')
-        ax.annotate("G",(1,0),xytext=(1.0,-0.15),horizontalalignment='center')
-        ax.annotate("AG",self.corners[2],xytext=self.corners[2]+np.array([0.01,0.06]),horizontalalignment='center')
+        ax.annotate(typelabels[0],(0,0),xytext=(-0.0,-0.15),horizontalalignment='center')
+        ax.annotate(typelabels[1],(1,0),xytext=(1.0,-0.15),horizontalalignment='center')
+        ax.annotate(typelabels[2],self.corners[2],xytext=self.corners[2]+np.array([0.01,0.06]),horizontalalignment='center')
 
