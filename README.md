@@ -11,8 +11,10 @@ denoting the strength of change is created. As a bonus, the fixed
 points of the dynamics are also shown (without stability, though).
 
 basic usage:
+
 1. initialize egtsimplex-object with function f(x,t)
 2. use the plot_simplex() method to plot the simplex
+
 *see file "./plot_example.py" for an example*
 
 
