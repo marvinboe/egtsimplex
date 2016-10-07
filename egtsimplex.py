@@ -101,13 +101,19 @@ class simplex_dynamics:
         self.direction_norm=self.direction_norm
         #print(direction_ba_norm)
         self.pvals =[np.linalg.norm(v) for v in direction]
+        self.direction=np.array([self.ba2xy(v) for v in direction])
 
     def plot_simplex(self,ax,cmap='viridis',typelabels=["A","B","C"],**kwargs):
 
         ax.triplot(self.triangle,linewidth=0.8,color="black")
         ax.tricontourf(self.trimesh, self.pvals, alpha=0.8, cmap=cmap,**kwargs)
-        # Q = ax.quiver(self.trimesh.x, self.trimesh.y, self.direction_norm.T[0],self.direction_norm.T[1],self.pvals,angles='xy',pivot='tail',  cmap=cmap)#pivot='mid',
-        Q = ax.quiver(self.trimesh.x, self.trimesh.y, self.direction_norm.T[0],self.direction_norm.T[1],angles='xy',pivot='tail')#pivot='mid',
+
+        #arrow plot options:
+        # Q = ax.quiver(self.trimesh.x, self.trimesh.y, self.direction_norm.T[0],self.direction_norm.T[1],self.pvals,angles='xy',pivot='mid',  cmap=cmap)#pivot='tail',
+        Q = ax.quiver(self.trimesh.x, self.trimesh.y, self.direction_norm.T[0],self.direction_norm.T[1],angles='xy',pivot='mid')#pivot='tail')#
+        # Q = ax.quiver(self.trimesh.x, self.trimesh.y, self.direction.T[0],self.direction.T[1],angles='xy',pivot='mid')#pivot='tail')#
+
+
         ax.axis('equal')
         ax.axis('off')
 
