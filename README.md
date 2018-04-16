@@ -1,5 +1,6 @@
 # egtsimplex
 Plotting a simplex for three player evolutionary games with python.
+<img src"images/example_plot.png" width="500" height="400" />
 
 !Needs python 3.5 or higher!
 

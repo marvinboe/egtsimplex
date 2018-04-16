@@ -116,12 +116,15 @@ class simplex_dynamics:
 
         ax.axis('equal')
         ax.axis('off')
+        margin=0.01
+        ax.set_ylim(ymin=-margin,ymax=self.r2[1]+margin)
+        ax.set_xlim(xmin=-margin,xmax=1.+margin)
 
         #timescatter=ax.scatter(points[::5,0],points[::5,1],c=t[::5],linewidth=0.0,cmap='viridis',alpha=.5)
         if self.fixpoints.shape[0]>0:
             ax.scatter(self.fixpoints[:,0],self.fixpoints[:,1],c="black",s=70,linewidth=0.3)
         #fig.colorbar(timescatter,label="time")
-        ax.annotate(typelabels[0],(0,0),xytext=(-0.0,-0.15),horizontalalignment='center')
-        ax.annotate(typelabels[1],(1,0),xytext=(1.0,-0.15),horizontalalignment='center')
-        ax.annotate(typelabels[2],self.corners[2],xytext=self.corners[2]+np.array([0.01,0.06]),horizontalalignment='center')
+        ax.annotate(typelabels[0],(0,0),xytext=(-0.0,-0.02),horizontalalignment='center',va='top')
+        ax.annotate(typelabels[1],(1,0),xytext=(1.0,-0.02),horizontalalignment='center',va='top')
+        ax.annotate(typelabels[2],self.corners[2],xytext=self.corners[2]+np.array([0.0,0.02]),horizontalalignment='center',va='bottom')
 
